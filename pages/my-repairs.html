@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0b1f3a">
+    <title>Mobile DR | मेरे रिपेयर</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <style>
+        .repairs-page{padding:16px 14px 100px}.page-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
+        .page-head h1{font-size:22px;margin-bottom:5px}.page-head p{font-size:12px;color:var(--muted);line-height:1.5}
+        .repair-toolbar{display:flex;gap:8px;margin:14px 0;overflow:auto}.repair-filter{min-height:40px;padding:8px 11px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text);white-space:nowrap}
+        .repair-item{padding:14px}.repair-item-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.repair-item h2{font-size:16px;margin:0 0 4px}.repair-meta{font-size:11px;color:var(--muted);line-height:1.5}.repair-summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.repair-summary div{padding:9px;background:var(--surface-2);border-radius:8px}.repair-summary small{display:block;color:var(--muted);font-size:10px}.repair-summary strong{display:block;font-size:12px;margin-top:2px}.repair-item-actions{display:flex;gap:8px}.repair-item-actions button{flex:1;min-height:40px;border:0;border-radius:9px;font-weight:700}.view-btn{background:var(--navy);color:#fff}.print-btn-small{background:var(--surface-2);color:var(--text)}
+        .status{display:inline-flex;padding:5px 9px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}.status-received{background:rgba(23,105,224,.1);color:var(--blue)}.status-progress{background:rgba(215,166,42,.14);color:#8b6810}.status-ready{background:rgba(22,163,74,.1);color:var(--green)}.status-picked-up{background:rgba(102,112,133,.12);color:var(--muted)}.status-cancelled{background:rgba(220,38,38,.1);color:var(--red)}
+        .empty-state{padding:34px 16px}.empty-state .new-repair-btn{display:inline-flex;margin-top:12px;padding:11px 15px;border-radius:9px;background:var(--blue);color:#fff;font-weight:700}
+        .detail-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:1500;display:none;align-items:flex-end}.detail-backdrop.open{display:flex}.detail-sheet{width:100%;max-height:88vh;overflow:auto;background:var(--surface);border-radius:18px 18px 0 0;padding:16px}.detail-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}.detail-head h2{font-size:18px}.detail-close{width:36px;height:36px;border:0;border-radius:50%;background:var(--surface-2);font-size:22px;color:var(--text)}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.detail-row{padding:9px;background:var(--surface-2);border-radius:8px}.detail-row.full{grid-column:1/-1}.detail-row small{display:block;color:var(--muted);font-size:10px;margin-bottom:3px}.detail-row strong,.detail-row span{font-size:12px;line-height:1.45}.status-track{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:12px 0}.track-step{font-size:9px;text-align:center;color:var(--muted)}.track-dot{height:7px;border-radius:10px;background:var(--border);margin-bottom:4px}.track-step.active .track-dot{background:var(--blue)}.track-step.active{color:var(--blue);font-weight:700}
+        @media(max-width:360px){.repair-summary,.detail-grid{grid-template-columns:1fr}.detail-row.full{grid-column:auto}}
+    </style>
+</head>
+<body>
+<div id="app">
+<header class="app-header">
+    <div class="header-left">
+        <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu" aria-controls="sideDrawer" aria-expanded="false" type="button"><span></span><span></span><span></span></button>
+        <a href="../index.html" class="brand"><div class="brand-mark"><span>DR</span></div><div class="brand-text"><strong>MOBILE DR</strong><small data-i18n="brandTagline">Mobile Repair & Accessories</small></div></a>
+    </div>
+    <div class="header-actions">
+        <button class="icon-btn" id="langBtn" type="button" aria-label="Change language"><span id="langText">EN</span></button>
+        <button class="icon-btn" id="themeBtn" type="button" aria-label="Change theme"><span id="themeIcon">☾</span></button>
+    </div>
+</header>
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="side-drawer" id="sideDrawer" aria-label="Navigation Drawer" aria-hidden="true">
+    <div class="drawer-header"><div class="drawer-brand"><div class="brand-mark"><span>DR</span></div><div><strong>MOBILE DR</strong><small data-i18n="appName">Mobile Shop Management</small></div></div><button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">×</button></div>
+    <div class="drawer-profile"><div class="profile-avatar">👤</div><div class="profile-info"><strong data-i18n="customer">ग्राहक</strong><small data-i18n="welcome">Mobile DR में आपका स्वागत है</small></div></div>
+    <div class="drawer-lang-selector"><div class="language-selector"><button type="button" class="language-option active" data-lang="hi">हिंदी</button><button type="button" class="language-option" data-lang="en">English</button></div></div>
+    <nav class="drawer-nav">
+        <p class="nav-section-title" data-i18n="customerSection">ग्राहक</p>
+        <a href="../index.html" class="drawer-link" data-page="home"><span class="nav-icon" aria-hidden="true">⌂</span><span data-i18n="home">होम</span></a>
+        <a href="products.html" class="drawer-link" data-page="products"><span class="nav-icon" aria-hidden="true">▣</span><span data-i18n="products">प्रोडक्ट्स</span></a>
+        
+        <a href="repair.html" class="drawer-link" data-page="repair"><span class="nav-icon" aria-hidden="true">📱</span><span data-i18n="newRepair">नया रिपेयर</span></a>
+        <a href="my-repairs.html" class="drawer-link" data-page="my-repairs"><span class="nav-icon" aria-hidden="true">🛠</span><span data-i18n="myRepairs">मेरे रिपेयर</span></a>
+        
+        <p class="nav-section-title" data-i18n="moreSection">अन्य</p>
+        <a href="offers.html" class="drawer-link" data-page="offers"><span class="nav-icon" aria-hidden="true">🎁</span><span data-i18n="offers">ऑफर्स</span></a>
+        <a href="support.html" class="drawer-link" data-page="support"><span class="nav-icon" aria-hidden="true">💬</span><span data-i18n="support">ग्राहक सहायता</span></a>
+        
+        
+        <a href="settings.html" class="drawer-link" data-page="settings"><span class="nav-icon" aria-hidden="true">⚙</span><span data-i18n="settings">सेटिंग्स</span></a>
+        <a href="../admin/login.html" class="drawer-link" data-page="admin-login"><span class="nav-icon" aria-hidden="true">🔐</span><span data-i18n="adminLogin">Staff Login</span></a>
+    </nav>
+</aside>
+<main class="repairs-page">
+    <section class="page-card page-head">
+        <h1 data-i18n="myRepairs">मेरे रिपेयर</h1>
+        <p data-i18n="myRepairsDesc">आपके जमा किए गए मोबाइल रिपेयर और उनकी वर्तमान स्थिति यहाँ दिखाई जाएगी।</p>
+    </section>
+    <div class="repair-toolbar">
+        <button class="repair-filter active" type="button" data-filter="all" data-i18n="all">सभी</button>
+        <button class="repair-filter" type="button" data-filter="received" data-i18n="submitted">जमा</button>
+        <button class="repair-filter" type="button" data-filter="progress" data-i18n="progress">काम चल रहा है</button>
+        <button class="repair-filter" type="button" data-filter="ready" data-i18n="ready">तैयार</button>
+        <button class="repair-filter" type="button" data-filter="picked_up" data-i18n="pickedUp">फोन ले लिया</button>
+    </div>
+    <section id="repairsList"></section>
+</main>
+<nav class="bottom-nav">
+    <a href="../index.html" class="bottom-nav-item" data-page="home"><span>⌂</span><small data-i18n="home">होम</small></a>
+    <a href="products.html" class="bottom-nav-item" data-page="products"><span>🛍</span><small data-i18n="products">प्रोडक्ट</small></a>
+    <a href="repair.html" class="bottom-nav-item repair-nav-item" data-page="repair"><span>+</span><small data-i18n="repair">रिपेयर</small></a>
+    <a href="my-repairs.html" class="bottom-nav-item" data-page="my-repairs"><span>📋</span><small data-i18n="myRepairs">मेरे रिपेयर</small></a>
+</nav>
+<div class="detail-backdrop" id="detailBackdrop" aria-hidden="true">
+    <section class="detail-sheet" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+        <div class="detail-head"><h2 id="detailTitle">रिपेयर विवरण</h2><button class="detail-close" id="detailClose" type="button">×</button></div>
+        <div id="repairDetail"></div>
+    </section>
+</div>
+</div>
+<script src="../data/translations.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script><script src="../js/firebase-config.js"></script><script src="../js/firebase-db.js"></script><script src="../js/storage.js"></script>
+<script src="../js/repairs.js"></script>
+<script src="../js/print.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/navigation.js"></script>
+<script>
+"use strict";
+const MyRepairs={
+ filter:"all",
+ init(){this.list=document.getElementById("repairsList");this.bindFilters();document.getElementById("detailClose")?.addEventListener("click",()=>this.closeDetail());document.getElementById("detailBackdrop")?.addEventListener("click",e=>{if(e.target.id==="detailBackdrop")this.closeDetail()});document.addEventListener("keydown",e=>{if(e.key==="Escape")this.closeDetail()});window.addEventListener("storage",e=>{if(e.key===MobileDRStorage.keys.repairs)this.render()});window.addEventListener("mobileDR:data",e=>{if(e.detail?.collection==="repairs")this.render()});window.addEventListener("mobileDR:language",()=>this.render());this.unsubscribeCloud=window.MobileDRFirebase?.listenMyRepairs?.(()=>this.render());this.render()},
+ bindFilters(){document.querySelectorAll(".repair-filter").forEach(btn=>btn.addEventListener("click",()=>{this.filter=btn.dataset.filter||"all";document.querySelectorAll(".repair-filter").forEach(x=>x.classList.toggle("active",x===btn));this.render()}))},
+ statusLabel(status){return({received:MobileDR.t("submitted","जमा"),progress:MobileDR.t("progress","काम चल रहा है"),ready:MobileDR.t("ready","तैयार"),picked_up:MobileDR.t("pickedUp","फोन ले लिया"),cancelled:MobileDR.t("cancelled","रद्द")})[status]||MobileDR.t("submitted","जमा")},
+ statusClass(status){return`status-${status||"received"}`},
+ escape(value){const d=document.createElement("div");d.textContent=value??"";return d.innerHTML},
+ issue(r){return(r.issues||r.fault?.types||[]).join?.(", ")||r.description||r.fault?.description||MobileDR.t("noIssue","समस्या दर्ज नहीं")},
+ find(id){return MobileDRStorage.getRepairs().find(r=>r.id===id)},
+ render(){const all=MobileDRStorage.getRepairs();const repairs=this.filter==="all"?all:all.filter(r=>(r.status||"received")===this.filter);if(!repairs.length){this.list.innerHTML=`<div class="page-card empty-state"><div class="empty-state-icon">📱</div><h3>${MobileDR.t("noRepairs","अभी कोई रिपेयर रिकॉर्ड नहीं")}</h3><p>${MobileDR.t("noRepairsDesc","जब आप मोबाइल रिपेयर के लिए जमा करेंगे, उसका रिकॉर्ड यहाँ दिखाई देगा।")}</p><a class="new-repair-btn" href="repair.html">${MobileDR.t("submitNewRepair","नया रिपेयर जमा करें")}</a></div>`;return}this.list.innerHTML=repairs.map(r=>{const status=r.status||"received";return`<article class="page-card repair-item"><div class="repair-item-head"><div><h2>${this.escape(r.model||r.device?.model||"मोबाइल")}</h2><div class="repair-meta">${this.escape(r.receiptNo||"—")} · ${this.escape(r.submissionDate||"—")}</div></div><span class="status ${this.statusClass(status)}">${this.statusLabel(status)}</span></div><div class="repair-summary"><div><small>${MobileDR.t("issue","समस्या")}</small><strong>${this.escape(this.issue(r))}</strong></div></div><div class="repair-item-actions"><button class="view-btn" type="button" data-view="${this.escape(r.id)}">${MobileDR.t("viewDetails","विवरण देखें")}</button><button class="print-btn-small" type="button" data-print="${this.escape(r.id)}">${MobileDR.t("printReceipt","रसीद प्रिंट / Save PDF")}</button></div></article>`}).join("");this.list.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>this.openDetail(b.dataset.view)));this.list.querySelectorAll("[data-print]").forEach(b=>b.addEventListener("click",()=>this.printReceipt(b.dataset.print)))},
+ openDetail(id){const r=this.find(id);if(!r)return;const status=r.status||"received",steps=["received","progress","ready","picked_up"],current=steps.indexOf(status);document.getElementById("repairDetail").innerHTML=`<div class="status-track">${steps.map((s,i)=>`<div class="track-step ${i<=current?"active":""}"><div class="track-dot"></div>${this.statusLabel(s)}</div>`).join("")}</div><div class="detail-grid"><div class="detail-row"><small>${MobileDR.t("receiptNo","रसीद नंबर")}</small><strong>${this.escape(r.receiptNo)}</strong></div><div class="detail-row"><small>${MobileDR.t("submittedDate","जमा तारीख")}</small><strong>${this.escape(r.submissionDate)}</strong></div><div class="detail-row"><small>${MobileDR.t("customer","ग्राहक")}</small><strong>${this.escape(r.name||r.customer?.name)}</strong></div><div class="detail-row"><small>${MobileDR.t("mobile","मोबाइल")}</small><strong>${this.escape(r.mobile||r.customer?.mobile)}</strong></div><div class="detail-row"><small>${MobileDR.t("model","मॉडल")}</small><strong>${this.escape(r.model||r.device?.model)}</strong></div><div class="detail-row"><small>${MobileDR.t("imei","IMEI")}</small><strong>${this.escape(r.imei||r.device?.imei||"—")}</strong></div><div class="detail-row full"><small>${MobileDR.t("issue","समस्या")}</small><span>${this.escape(this.issue(r))}</span></div><div class="detail-row full"><small>${MobileDR.t("repairWork","रिपेयर कार्य")}</small><span>${this.escape(r.fault?.repairWork||"—")}</span></div></div>`;const backdrop=document.getElementById("detailBackdrop");backdrop.classList.add("open");backdrop.setAttribute("aria-hidden","false");document.body.classList.add("no-scroll")},
+ closeDetail(){const b=document.getElementById("detailBackdrop");if(!b)return;b.classList.remove("open");b.setAttribute("aria-hidden","true");document.body.classList.remove("no-scroll")},
+ printReceipt(id){const r=this.find(id);if(!r)return;const issue=this.issue(r);if(window.MobileDRPrint?.receipt){window.MobileDRPrint.receipt(r,issue)}else{window.print()}}
+};
+document.addEventListener("DOMContentLoaded",()=>MyRepairs.init());
+</script>
+</body>
+</html>
